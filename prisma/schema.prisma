@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// обычный профак, потом можно еще много чего добавить
+model Profile {
+  id        String @id @default(uuid())
+  user_id   String @unique
+  name      String
+  image_url String @db.Text // просто для больших строчек (например, как ссылка на картинку)
+  email     String @db.Text
+
+  created_At DateTime @default(now()) // по дефолту будет значение момента времени, когда строчка создалась
+  updated_At DateTime @updatedAt()
+
+  servers  Server[] // автосейв сам эту штуку добавляет (это классно), но она значает, что у юзера есть колонка со списком серверов
+  members  Member[] // у профиля есть много мемберов (пока что doesnt make any sense =) )
+  channels Channel[]
+}
+
+// у нас можно будет создавать серваки, следовательно каждый пользователь может иметь много серваков
+// каждый сервак может иметь много пользователей
+
+model Server {
+  id          String @id @default(uuid())
+  name        String @unique // название сервера
+  image_url   String @db.Text // картинка сервера
+  invite_code String @db.Text // строчка инвайта на сервак тоже должна сториться где-то
+
+  // как мы конектим две этих таблицы?
+
+  profileId String // This field does exist in the database - it is the foreign key that connects Post and User.
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade) // сюда присасываем с помощью profileId юзера
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // чтобы убрать warning надо добавить index
+  members Member[] // у сервера много мемберов (many to many)
+  Channel Channel[]
+
+  @@index([profileId])
+}
+
+enum MemberRole {
+  ADMIN
+  MODERATOR
+  GUEST
+}
+
+// с помощью enum создаем все возможные роли юзера на сервере (и потом не пишем 300 раз какой-то списокБ просто кидаем туда этот енум)
+
+model Member {
+  id   String     @id @default(uuid())
+  role MemberRole @default(GUEST)
+
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId String
+
+  // у мембера опять таки много серваков (many to many)
+
+  serverId String
+  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([profileId])
+  @@index([serverId])
+}
+
+// модельку для каналов надо создать
+
+// но прежде надо понять, что каналы бывают только 3ех типов (текст / аудио / видео) => чтобы 1000 раз это не писать enum делаем модельку
+
+enum ChannelType {
+  TEXT
+  AUDIO
+  VIDEO
+}
+
+model Channel {
+  id   String      @id @default(uuid())
+  name String // название канала тоже надо будет
+  type ChannelType @default(TEXT) // по дефолту хотим текстовый канал
+  // на самом деле можно 10001230 всяких полей добавить (типо кол-во юзеров и т.д.)
+
+  // надо привязать этот канал к серваку
+
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  serverId String
+  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([profileId])
+  @@index([serverId])
+}
