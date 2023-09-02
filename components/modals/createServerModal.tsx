@@ -12,7 +12,7 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from '../../components/ui/dialog' // чтобы юзать окошко, нам понадобятся все эти штуки
+} from '../ui/dialog' // чтобы юзать окошко, нам понадобятся все эти штуки
 
 
 import {
@@ -33,6 +33,7 @@ import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import FileUpload from '../FileUpload'
 import { useRouter } from 'next/navigation'
+import { useModal } from '../hooks/use-modal-store'
 
 // создаем схему формы с помощью зода (крутая валидация)
 
@@ -47,19 +48,20 @@ const formSchema = z.object({
 // теперь просто берем и прокидываем нашу схему в форму с помощью резолвера
 
 
-export const InitialModal = () => {
+export const ServerModal = () => {
 
     const router = useRouter()
+
+    const { isOpen, onClose, onOpen, type } = useModal()
+
+    const isModalOpen = isOpen && type === 'createServer' // такая проверка, когда много типов модалок
+    // если просто указать isOpen, то при открытии другой модалки, стейт isOpen будет true и откроются другие
 
     // напоминаю себе, что эта штука будет рендериться, если у юзера, который зарегался еще нет серваков
 
     // модалки вызыват гидрацию, поэтому с помозью стейта и эффекта избавляемся от этих ошибок
 
-    const [isMounted, setIsMounted] = useState(false)
 
-    useEffect(() => {
-        setIsMounted(true)
-    }, [])
 
     const form = useForm({
         resolver: zodResolver(formSchema), // теперь форма должна соответствовать правилам описанным в formSchema
@@ -83,10 +85,9 @@ export const InitialModal = () => {
         try {
             await axios.post('/api/servers', values) // с помощью аксиоса создаем пост реквест на апишку и прокидываем values, которые получили из формы
             // теперь надо в апишке создать фолдер servers и там уже создать route.ts 
-            form.reset()
             router.refresh()
-            window.location.reload()
-            // тотальное обновление страницы
+            onClose()
+
 
         } catch (error) {
             console.log(error)
@@ -94,12 +95,16 @@ export const InitialModal = () => {
 
     }
 
-    if (!isMounted) return null; // избавились от ошибок 
+    const onChange = () => {
+        form.reset()
+        onClose()
+    } // нужна кастомная onChange, которая будет закрвать модалку (просто отччистка и просто onClose)
+
 
 
 
     return (
-        <Dialog open> {/* сделаем его по дефолту открытым */}
+        <Dialog open={isModalOpen} onOpenChange={onChange}> {/* сделаем его по дефолту открытым */}
             <DialogContent className='bg-white text-black p-0 overflow-hidden'>
                 <DialogHeader className='pt-8 px-6 flex flex-col gap-3 items-center justify-center'>
                     <DialogTitle className='text-2xl font-bold text-center'>
