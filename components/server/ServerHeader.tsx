@@ -53,19 +53,19 @@ const ServerHeader = ({ server, role }: ServerHeaderProps) => {
                     </DropdownMenuItem>
                 )}
                 {isMod && (
-                    <DropdownMenuItem className='cursor-pointer flex justify-between w-full text-black dark:text-white'>
+                    <DropdownMenuItem onClick={() => onOpen('createChannel', { server })} className='cursor-pointer flex justify-between w-full text-black dark:text-white'>
                         <span>Create Channel</span>
                         <PlusCircle />
 
                     </DropdownMenuItem>
                 )}
                 {isAdmin && (
-                    <DropdownMenuItem className='text-rose-500 flex items-center cursor-pointer justify-between font-semibold'>
+                    <DropdownMenuItem onClick={() => onOpen('deleteServer', { server })} className='text-rose-500 flex items-center cursor-pointer justify-between font-semibold'>
                         <span>Delete Server</span>
                         <Trash size={20} />
                     </DropdownMenuItem>
                 )}
-                {!isMod && <DropdownMenuItem className='cursor-pointer flex justify-center text-red-500'>
+                {!isMod && <DropdownMenuItem onClick={() => onOpen('leaveServer', { server })} className='cursor-pointer flex justify-between text-red-500'>
                     <span>Leave the Server</span>
                     <LogOut size={20} />
 
