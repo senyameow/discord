@@ -11,9 +11,11 @@ interface ServerSidebarProps {
 
 const ServerSidebar = async ({ serverId }: ServerSidebarProps) => {
 
+
     const profile = await currentProfile()
 
     if (!profile) return redirect('/')
+
 
     // ловим сервак
 
@@ -49,13 +51,15 @@ const ServerSidebar = async ({ serverId }: ServerSidebarProps) => {
     // получим все мемберов (но себя не надо) Я лежит в profile сейчас
     // просто отфильтруем всех мемберов, где их айдишник не равен профайл.айди
 
-    const members = server?.members.filter(member => member.id !== profile.id) // все, кроме нас
+    const members = server?.members.filter(member => member?.profileId !== profile.id) // все, кроме нас
 
-    const role = server?.members.find(member => member.id === profile.id)?.role // вернет нашу роль на сервере
+    const role = server?.members.find(member => member?.profileId === profile.id)?.role // вернет нашу роль на сервере
 
     // т.к. профайл это любой чел, мы должны найти его роль
     // например регается мужик к нам на сервак, у него не может быть админка
     // поэтому мы ищем роль, а не говорим, что если айдишник с нами совпал, то все мы короли танцпола
+
+    console.log(profile)
 
 
     return (

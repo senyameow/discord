@@ -33,7 +33,7 @@ model Server {
   id          String @id @default(uuid())
   name        String @unique // название сервера
   image_url   String @db.Text // картинка сервера
-  invite_code String @db.Text // строчка инвайта на сервак тоже должна сториться где-то
+  invite_code String @unique // строчка инвайта на сервак тоже должна сториться где-то + должна быть уникальной (иначе TS не пропустит даже)
 
   // как мы конектим две этих таблицы?
 
