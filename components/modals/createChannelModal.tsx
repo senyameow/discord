@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -29,7 +29,7 @@ import axios from 'axios';
 import { useForm } from 'react-hook-form'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useModal } from '../hooks/use-modal-store'
 import { ChannelType } from '@prisma/client'
 import qs from 'query-string'
@@ -47,9 +47,16 @@ import { ServerWithMembersWithProfiles } from '@/types'
 // создаем схему формы с помощью зода (крутая валидация)
 
 const formSchema = z.object({
-    name: z.string().min(3, {
+    name: z.string().min(1, {
         message: 'channel name is required!'
-    }),
+    }).max(10, {
+        message: 'channel name should contain less than 10 characters'
+    }).refine(
+        name => name !== "general",
+        {
+            message: "Channel name cannot be 'general'"
+        }
+    ),
     type: z.nativeEnum(ChannelType)
 })
 // теперь просто берем и прокидываем нашу схему в форму с помощью резолвера
@@ -58,12 +65,13 @@ const formSchema = z.object({
 export const ChannelModal = () => {
 
     const router = useRouter()
+    const params = useParams();
 
-    const [channelType, setChannelType] = useState(ChannelType.TEXT)
 
     const { isOpen, onClose, onOpen, type, data } = useModal()
 
-    const { server } = data as { server: ServerWithMembersWithProfiles }
+    const { channelType } = data
+
 
     const isModalOpen = isOpen && type === 'createChannel' // такая проверка, когда много типов модалок
     // если просто указать isOpen, то при открытии другой модалки, стейт isOpen будет true и откроются другие
@@ -78,11 +86,18 @@ export const ChannelModal = () => {
         resolver: zodResolver(formSchema), // теперь форма должна соответствовать правилам описанным в formSchema
         defaultValues: {
             name: '',
-            type: channelType
+            type: channelType || ChannelType.TEXT
         }
 
     }) // совмещение useForm + zod + zodResolver дает очень сильную связку в валидации форм
 
+    useEffect(() => {
+        if (channelType) {
+            form.setValue('type', channelType)
+        } else {
+            form.setValue('type', ChannelType.TEXT)
+        }
+    }, [form, channelType])
 
     const isLoading = form.formState.isSubmitting
     // еще классная штука, то что мы можем без всяуих экспериментальных хуков забрать лоадинг стейт 
@@ -98,10 +113,11 @@ export const ChannelModal = () => {
             const url = qs.stringifyUrl({
                 url: `/api/channels`,
                 query: {
-                    serverId: server.id
+                    serverId: params?.serverId
                 }
             })
             await axios.post(url, values)
+            form.reset()
             router.refresh()
             onClose()
 

@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 
 const UserAvatar = ({ image_url, className }: { image_url: string, className?: string }) => {
     return (
-        <Avatar className={cn('w-7 h-7 md:h-10 md:w-10', className)}>
+        <Avatar className={cn('w-6 h-6 md:h-10 md:w-10', className)}>
             <AvatarImage src={image_url} />
         </Avatar>
     )

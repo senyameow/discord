@@ -2,14 +2,19 @@
 // также мы можем сразу задать много типов модалок и просто потом при вызове стора указывать тип модалки
 
 import { ServerWithMembersWithProfiles } from '@/types';
+import { ChannelType } from '@prisma/client';
 import { Server } from 'http';
 import { create } from 'zustand'
 
 export type ModalType = 'createServer' | 'invite' | 'editServer' | 'manage' | 'createChannel' | 'leaveServer' | 'deleteServer'
 
 interface ModalData {
-    server?: ServerWithMembersWithProfiles
+    server?: Server
+    // было бы круто, если бы мы могли делать так, что когда создаем канал плюсиком в каждой секции, то нас не спрашивали бы КАКОЙ ТИП КАНАЛА
+    // поэтому давайте его тоже передавать как не обязательный пропс
+    channelType?: ChannelType
 } // для инвайтов
+
 interface ModalStore {
     type: ModalType | null; // сторим тип модалки
     data: ModalData;

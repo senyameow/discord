@@ -20,7 +20,9 @@ export async function POST(req: Request) { // просто прокинем од
 
         if (!serverId) return new NextResponse('no server id', { status: 500 })
 
-        const server = db.server.update({
+        if (name === 'general') return new NextResponse('name cannot be "general"', { status: 400 })
+
+        const server = await db.server.update({
             where: {
                 id: serverId,
                 members: {
@@ -33,7 +35,13 @@ export async function POST(req: Request) { // просто прокинем од
                 }
             },
             data: {
-
+                Channel: {
+                    create: {
+                        profileId: profile.id,
+                        name,
+                        type,
+                    }
+                }
             },
             include: {
                 members: {
