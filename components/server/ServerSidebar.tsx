@@ -1,6 +1,6 @@
 import { currentProfile } from '@/lib/current-profile';
 import { db } from '@/lib/db';
-import { ChannelType, MemberRole } from '@prisma/client';
+import { ChannelType, MemberRole, Server } from '@prisma/client';
 import { redirect } from 'next/navigation';
 import React from 'react'
 import ServerHeader from './ServerHeader';
@@ -179,7 +179,7 @@ const ServerSidebar = async ({ serverId }: ServerSidebarProps) => {
                                     key={channel.id}
                                     channel={channel}
                                     role={role}
-                                    server={server}
+                                    server={server as Server}
                                 />
                             ))}
                         </div>

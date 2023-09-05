@@ -8,6 +8,8 @@ import { MembersModal } from "../modals/MembersMoodal"
 import { ChannelModal } from "../modals/createChannelModal"
 import { LeaveModal } from "../modals/LeaveServerModal"
 import { DeleteModal } from "../modals/DeleteServerModal"
+import { DeleteChannelModal } from "../modals/DeleteChannelModal"
+import { EditChannelModal } from "../modals/editChannelModal"
 
 // здесь мы просто делаем провайдер в который обернем все приложение
 // это нам позволит доставать любые модалки из любого места (?*)
@@ -32,6 +34,8 @@ export const ModalProvider = () => {
             <ChannelModal />
             <LeaveModal />
             <DeleteModal />
+            <DeleteChannelModal />
+            <EditChannelModal />
 
         </>
     )

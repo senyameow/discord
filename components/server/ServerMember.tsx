@@ -34,8 +34,12 @@ const ServerMember = ({ member, server }: ServerMemberProps) => {
 
     const icon = roleIconMap[member.role]
 
+    const onClick = () => {
+        router.push(`/servers/${server.id}/conversations/${member.id}`)
+    }
+
     return (
-        <button className={cn(`group p-2 flex items-center gap-2 w-full hover:bg-zinc-700/10 dark:hover:bg-zinc-700/50 rounded-md`, params?.memberId === member.id && 'bg-zinc-700/20 dark:bg-zinc-700')}>
+        <button onClick={onClick} className={cn(`group p-2 flex items-center gap-2 w-full hover:bg-zinc-700/10 dark:hover:bg-zinc-700/50 rounded-md`, params?.memberId === member.id && 'bg-zinc-700/20 dark:bg-zinc-700')}>
             <UserAvatar image_url={member.profile.image_url} className='w-6 h-6 md:w-8 md:h-8' />
             <p className={cn(`text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition`, params.memberId === member.id && 'text-primary dark:text-zinc-200 dark:group-hover:text-white')}>{member.profile.name}</p>
             <span className='ml-auto'>{icon}</span>

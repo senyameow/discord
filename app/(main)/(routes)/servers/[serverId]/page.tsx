@@ -1,9 +1,15 @@
 import React from 'react'
 
-const Server = () => {
+interface ServerPageProps {
+    params: {
+        serverId: string
+    }
+}
+
+const ServerPage = async ({ params }: ServerPageProps) => {
     return (
-        <div>Server</div>
+        <div>ServerIdPage</div>
     )
 }
 
-export default Server
+export default ServerPage

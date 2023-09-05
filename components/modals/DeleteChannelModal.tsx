@@ -11,7 +11,7 @@ import {
     DialogTitle,
 } from '../ui/dialog' // чтобы юзать окошко, нам понадобятся все эти штуки
 
-
+import qs from 'query-string'
 
 
 
@@ -22,7 +22,7 @@ import { Button } from '../ui/button'
 import { Check, Copy, RefreshCw } from 'lucide-react'
 import axios from 'axios'
 import { db } from '@/lib/db'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { ServerWithMembersWithProfiles } from '@/types'
 
 // создаем схему формы с помощью зода (крутая валидация)
@@ -31,29 +31,38 @@ import { ServerWithMembersWithProfiles } from '@/types'
 // теперь просто берем и прокидываем нашу схему в форму с помощью резолвера
 
 
-export const DeleteModal = () => {
+export const DeleteChannelModal = () => {
 
     const [isLoading, setIsLoading] = useState(false)
 
     const router = useRouter()
+    const params = useParams()
 
 
     const { isOpen, onClose, onOpen, type, data } = useModal()
 
-    const server = data as ServerWithMembersWithProfiles // берем сервер из даты
+    const { server, channel } = data // берем сервер из даты
 
-    const isModalOpen = type === 'deleteServer' && isOpen
+    const isModalOpen = type === 'deleteChannel' && isOpen
 
 
 
     const onDelete = async () => {
         try {
             setIsLoading(true)
-            const res = await axios.patch(`/api/servers/${server?.id}/delete`)
+            // мне надо и сервер айди и канал айди, т.е. много всего надо, просто через парамсы будет сложно
+            // следовательно проще заюзать qs
+            const url = qs.stringifyUrl({
+                url: `/api/channels/${channel?.id}`,
+                query: {
+                    serverId: server?.id
+                }
+            })
+            await axios.delete(url)
 
             onClose() // закрыли модалку
             router.refresh() // зарефрешили ui
-            router.push('/') // кинули юзера на базу
+            router.push(`/servers/${server?.id}`) // кинули юзера на базу
 
 
 
@@ -70,11 +79,11 @@ export const DeleteModal = () => {
             <DialogContent className='bg-white text-black p-0 overflow-hidden'>
                 <DialogHeader className='pt-8 px-6 flex flex-col gap-3 items-center justify-center'>
                     <DialogTitle className='text-2xl font-bold text-center'>
-                        Delete Server
+                        Delete Channel
                     </DialogTitle>
                     <DialogDescription>
-                        Are You Sure You Want To Delete {` `} <span> </span>
-                        <span className='text-indigo-500 font-semibold'>{server?.name}</span>
+                        Are You Sure You Want To Delete #{` `} <span> </span>
+                        <span className='text-indigo-500 font-semibold'>{channel?.name}</span>
                     </DialogDescription>
 
                 </DialogHeader>
