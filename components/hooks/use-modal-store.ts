@@ -5,7 +5,7 @@ import { ServerWithMembersWithProfiles } from '@/types';
 import { Channel, ChannelType, Server } from '@prisma/client';
 import { create } from 'zustand'
 
-export type ModalType = 'createServer' | 'invite' | 'editServer' | 'manage' | 'createChannel' | 'leaveServer' | 'deleteServer' | 'deleteChannel' | 'editChannel'
+export type ModalType = 'createServer' | 'invite' | 'editServer' | 'manage' | 'createChannel' | 'leaveServer' | 'deleteServer' | 'deleteChannel' | 'editChannel' | 'messageFile'
 
 interface ModalData {
     server?: Server;
@@ -13,7 +13,10 @@ interface ModalData {
     // было бы круто, если бы мы могли делать так, что когда создаем канал плюсиком в каждой секции, то нас не спрашивали бы КАКОЙ ТИП КАНАЛА
     // поэтому давайте его тоже передавать как не обязательный пропс
     channelType?: ChannelType
-} // для инвайтов
+    apiUrl?: string;
+    query?: Record<string, any>
+
+} // дата, которую можно передавать и потом забирать!
 
 interface ModalStore {
     type: ModalType | null; // сторим тип модалки

@@ -45,7 +45,7 @@ const ServerSearch = ({ data }: ServerSearchProps) => {
     }, []) // таким образом реализуем шорткат (очень круто + полезно)
 
     const router = useRouter()
-    const params = useParams()
+    const params = useParams()!
 
     // теперь при нажатии на айтем надо перенаправлять чуваков на каналы (как это можно реализовать)
     // явно нам нужен онклик, который кидаем в сам айтем

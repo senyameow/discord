@@ -81,7 +81,7 @@ const ServerSidebar = async ({ serverId }: ServerSidebarProps) => {
 
 
     return (
-        <div className='h-full flex flex-col text-primary bg-[F2F3F5] dark:bg-[2B2D31]'>
+        <div className='h-full flex flex-col text-primary bg-[F2F3F5] dark:bg-[2B2D31] w-full'>
             <ServerHeader server={server} role={role} />
             <ScrollArea className='flex-1 px-3'> {/* даем флекс 1 т.к. должна занимать все остальную область px - отступ по краям */}
                 <div className='mt-2'>

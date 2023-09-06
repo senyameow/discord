@@ -7,7 +7,7 @@ import '@uploadthing/react/styles.css'
 
 // теперь надо забрать картинку с хранилища (как?)
 
-import { X } from 'lucide-react'
+import { FileIcon, X } from 'lucide-react'
 import Image from 'next/image'
 
 interface FileUploadProps {
@@ -36,6 +36,15 @@ const FileUpload = ({ endpoint, value, onChange }: FileUploadProps) => {
                 <button onClick={() => onChange('')} className='absolute top-0 right-0 rounded-full p-1 shadow-lg shadow-gray-400 bg-red-500'>
                     <X className=' w-4 h-4 text-white' type='button' />
                 </button> {/* с помощью такой ерунды как onChange мы можем убирать эту фотку и вставлять другую (просто пропихиваем пустую строчку, что заменяет наш линк картинки на пустую строку) */}
+            </div>
+        )
+    }
+
+    if (fileType === 'pdf' && value) {
+        return (
+            <div className='relative bg-black/10 flex items-center'>
+                <FileIcon />
+                <a href={value} className='' target='_blank' rel='noopener noreferrer'></a>
             </div>
         )
     }

@@ -10,6 +10,7 @@ import { LeaveModal } from "../modals/LeaveServerModal"
 import { DeleteModal } from "../modals/DeleteServerModal"
 import { DeleteChannelModal } from "../modals/DeleteChannelModal"
 import { EditChannelModal } from "../modals/editChannelModal"
+import { MessageFileModal } from "../modals/MessageFileModal"
 
 // здесь мы просто делаем провайдер в который обернем все приложение
 // это нам позволит доставать любые модалки из любого места (?*)
@@ -36,6 +37,7 @@ export const ModalProvider = () => {
             <DeleteModal />
             <DeleteChannelModal />
             <EditChannelModal />
+            <MessageFileModal />
 
         </>
     )
