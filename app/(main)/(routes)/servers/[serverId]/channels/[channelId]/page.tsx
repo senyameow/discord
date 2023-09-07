@@ -37,6 +37,8 @@ const ChannelIdPage = async ({ params }: ChannelIdPageProps) => {
         }
     })
 
+    console.log(member)
+
     // мы должны даже продумать кейс, если юзер пытается через юрл зайти на сервак, поэтому сразу это подсекаем тут
 
     if (!member || !channel) {

@@ -28,6 +28,7 @@ export const useChatQuery = ({ queryKey, apiUrl, paramKey, paramValue }: useChat
     const fetchMessages = async ({ pageParam = undefined }) => {
         // создаем юрл, по которому будет происходить запрос
 
+
         const url = qs.stringifyUrl({
             url: apiUrl,
             query: {

@@ -143,7 +143,7 @@ export const MessageFileModal = () => {
 
                         </div>
                         <DialogFooter className='px-6 py-4 bg-gray-100 flex items-end place-items-end'>
-                            <Button disabled={isLoading} variant={'primary'}>
+                            <Button type='submit' disabled={isLoading} variant={'primary'}>
                                 Send
                             </Button>
                         </DialogFooter>

@@ -67,10 +67,11 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
     const router = useRouter()
 
     const form = useForm<z.infer<typeof formSchema>>({ // прокинули z.infer с типом нашей схемы формы
+        resolver: zodResolver(formSchema),
         defaultValues: {
             content: '', // конечно, сначала поле для смски пустое
         },
-        resolver: zodResolver(formSchema) // не забываем прокинуть резолвер и в него схему
+        // не забываем прокинуть резолвер и в него схему
 
     })
 

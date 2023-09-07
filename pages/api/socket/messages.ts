@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
 
         if (!profile) return res.status(401).json({ error: 'Unauthorized' })
 
-        const { content, file_url } = req.body // так мы ловим то, что было отправлено по запросу
+        const { content } = req.body // так мы ловим то, что было отправлено по запросу
 
         const { channelId, serverId } = req.query // а вот так мы ловим квери (НУ ХОЧЕТСЯ КАК В АПИШКЕ ЧЕРЕЗ ПАРАМСЫ )
 
@@ -68,7 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
                 channelId: channelId as string,
                 memberId: member.id,
                 deleted: false,
-                fileUrl: file_url
+                fileUrl: content
             },
             include: {
                 member: {

@@ -1,9 +1,14 @@
 'use client'
-import { Member } from '@prisma/client';
-import React from 'react'
+import { Member, Message, Profile } from '@prisma/client';
+import React, { Fragment } from 'react'
 import ChatWelcome from './ChatWelcome';
 import { useChatQuery } from '../hooks/use-chat';
 import { Loader2, ServerCrash } from 'lucide-react';
+import ChatMessage from './ChatMessage';
+import { format, formatDistance, formatRelative, subDays } from 'date-fns'
+
+const DATE_FORMAT = 'd MMM yyyy, HH:mm' // так можно задать темплейт для даты (формата)
+
 
 // какие пропсы мне нужны, чтобы сделать чат, и чтобы его можно было заюзать и для каналов и для 1 х 1?
 
@@ -19,6 +24,13 @@ interface ChatMessagesProps {
     type: 'channel' | 'conversation'
 }
 
+// понадоилось сделать тип, делаем
+
+type MessageWithMembersWithProfiles = Message & {
+    member: Member & {
+        profile: Profile
+    }
+} // вот так можно сделать тип, просто как конструктор собрать (как мы делаем с помоью инклюда в призме)
 
 
 const ChatMessages = ({ name, chatId, member, apiUrl, socketUrl, socketQuery, paramKey, paramValue, type }: ChatMessagesProps) => {
@@ -26,6 +38,8 @@ const ChatMessages = ({ name, chatId, member, apiUrl, socketUrl, socketQuery, pa
     const queryKey = `chat:${chatId}`
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useChatQuery({ queryKey, apiUrl, paramKey, paramValue })
+
+    // но вот мы все сделали, но это все хорошо, а как получить то смски и вывести их?
 
     if (status === 'loading') {
         return (
@@ -52,6 +66,17 @@ const ChatMessages = ({ name, chatId, member, apiUrl, socketUrl, socketQuery, pa
         <div className='flex-1 flex flex-col overflow-y-auto border-rose-400 border'>
             <div className='flex-1 border border-blue-300' />
             <ChatWelcome type={type} name={name} />
+            <div className='flex flex-col-reverse'>
+                {data?.pages?.map((group, ind) => (
+                    <Fragment key={ind}>
+                        {group.items.map((message: MessageWithMembersWithProfiles) => (
+                            <ChatMessage id={message.id} isUpdated={message.updated_At !== message.created_At} timestamp={format(new Date(message.created_At), DATE_FORMAT)} deleted={message.deleted} member={message.member} fileUrl={message.fileUrl!} socketQuery={socketQuery} socketUrl={socketUrl} content={message.content} currentMember={member} />
+                        ))} {/* для нормального формата даты, проще заюзать date-fns */}
+                    </Fragment>
+                ))}
+            </div>
+
+
         </div>
     )
 }
