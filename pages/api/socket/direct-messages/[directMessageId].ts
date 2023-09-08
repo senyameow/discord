@@ -35,53 +35,46 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
 
         const profile = await currentProfile(req)
 
-        const { messageId, serverId, channelId } = req.query
+        const { conversationId, directMessageId } = req.query
 
         const { content } = req.body // и забираем контент
 
-        if (!profile) return res.status(400).json({ error: 'Unauthorized' })
-        if (!serverId) return res.status(400).json({ error: 'No server id' })
-        if (!channelId) return res.status(400).json({ error: 'No channel id' })
+        if (!profile) return res.status(401).json({ error: 'QWE' })
+        if (!conversationId) return res.status(400).json({ error: 'No conversation id' })
 
         // теперь просто ищем сервак
 
-        const server = await db.server.findFirst({
-            where: {
-                id: serverId as string,
-                members: {
-                    some: {
-                        profileId: profile.id
-                    }
-                }
-            },
-            include: {
-                members: true // нужны аватарки, имена
-            }
-        })
-        if (!server) return res.status(400).json({ error: 'No server found' })
 
-
-        const channel = await db.channel.findFirst({
-            where: {
-                id: channelId as string,
-                serverId: serverId as string,
-
-            }
-        })
-        if (!channel) return res.status(400).json({ error: 'No channel found' })
 
         // чувака уже можно файндом найти просто в списке
 
-        const member = server.members.find(member => member.profileId === profile.id)
+        const conversation = await db.conversation.findFirst({
+            where: {
+                id: conversationId as string,
+            },
+            include: {
+                memberOne: {
+                    include: {
+                        profile: true
+                    }
+                },
+                memberTwo: {
+                    include: {
+                        profile: true
+                    }
+                },
+            }
+        })
+
+        const member = conversation?.memberOne.profileId === profile.id ? conversation.memberOne : conversation?.memberTwo
 
         if (!member) return res.status(400).json({ error: 'No member found' })
 
 
-        let message = await db.message.findFirst({
+        let directMessage = await db.directMessage.findFirst({
             where: {
-                channelId: channelId as string,
-                memberId: member.id,
-                id: messageId as string,
+                conversationId: conversationId as string,
+                id: directMessageId as string,
 
             },
             include: {
@@ -93,29 +86,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
             }
         }) // нашли смску
 
-        if (!message?.deleted && !message) return res.status(400).json({ error: 'no message found' })
+        if (!directMessage) return res.status(400).json({ error: 'no message found' })
 
         // сделаю переменные, но хз зачем
 
         const isMod = member.role === MemberRole.MODERATOR
-        const isOwner = message.memberId === member.id
+        const isOwner = directMessage.memberId === member.id
         const isAdmin = member.role === MemberRole.ADMIN
         const ableToEdit = isOwner || isAdmin || isMod
 
-        if (!ableToEdit) return res.status(401).json({ error: 'Unauthorized' })
+
+        if (!ableToEdit) return res.status(401).json({ error: 'NOT ABLE TO EDIT' })
 
         if (req.method === 'DELETE') {
 
-            message = await db.message.update({ // мы не удаляем, а именно заменяем, т.к. делит просто удаляет строчку
+            directMessage = await db.directMessage.update({ // мы не удаляем, а именно заменяем, т.к. делит просто удаляет строчку
                 // а нам надо просто удалить контент и поставить тру в столбике с делитед
                 where: {
-                    id: messageId as string,
-                    channelId: channelId as string,
+                    id: directMessageId as string,
                 },
                 data: {
-                    fileUrl: null,
+                    file_url: null,
                     content: 'This message has been deleted',
-                    deleted: true,
+                    // deleted: true,
                 },
                 include: {
                     member: {
@@ -131,11 +124,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
             if (!isOwner) return res.status(401).json({ error: 'not allowed' })
             // т.к. может быть такое, что попытаются как-то другими путями, хотя мы даже не показываем кнопку в таком случае
             // но так как мы делаем это через апишку, то рассматриваем все случаи 
-            message = await db.message.update({ // мы не удаляем, а именно заменяем, т.к. делит просто удаляет строчку
+            directMessage = await db.directMessage.update({ // мы не удаляем, а именно заменяем, т.к. делит просто удаляет строчку
                 // а нам надо просто удалить контент и поставить тру в столбике с делитед
                 where: {
-                    id: messageId as string,
-                    channelId: channelId as string,
+                    id: directMessageId as string,
 
                 },
                 data: {
@@ -151,13 +143,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
             })
         }
 
-        const updateKey = `chat:${channelId}/messages/update`
+        const updateKey = `chat:${conversation?.id}/messages/update`
 
-        res?.socket?.server?.io?.emit(updateKey, message) // так мы кидаем в сокет инфу (через emit)
+        res?.socket?.server?.io?.emit(updateKey, directMessage) // так мы кидаем в сокет инфу (через emit)
 
         // респонс сокет сервер айо => emit(key, args)
 
-        return res.status(200).json(message)
+        return res.status(200).json(directMessage)
 
 
     } catch (error) {

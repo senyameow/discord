@@ -14,10 +14,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
 
         const { content, fileUrl } = req.body // так мы ловим то, что было отправлено по запросу
 
-        const { channelId, serverId } = req.query // а вот так мы ловим квери (НУ ХОЧЕТСЯ КАК В АПИШКЕ ЧЕРЕЗ ПАРАМСЫ )
+        const { conversationId } = req.query // а вот так мы ловим квери (НУ ХОЧЕТСЯ КАК В АПИШКЕ ЧЕРЕЗ ПАРАМСЫ )
 
-        if (!serverId) return res.status(400).json({ error: 'no server id provided' })
-        if (!channelId) return res.status(400).json({ error: 'no channel id provided' })
+        if (!conversationId) return res.status(400).json({ error: 'no server id provided' })
         if (!content) return res.status(400).json({ error: 'no content provided' })
 
         // что мы вообще делаем?
@@ -29,46 +28,52 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
         // т.к. чтобы залить смску в табличку messages, нам нужны эти поля там
 
 
-        const server = await db.server.findFirst({
+        const conversation = await db.conversation.findFirst({
             where: {
-                id: serverId as string, // ругается тс, что квери может прилететь списком или ну короче не строкой
-
-                members: {
-                    some: {
-                        profileId: profile.id // проверка, что мы отправляем смску, в бд только если мы находимся в списке мемберов этого сервера (А ТО ЧИТЕРЫ ЧЕРЕЗ ЮРЛ БУДУТ запросы писать!!!)
-                    }
-                }
+                id: conversationId as string,
+                // OR: [
+                //     {
+                //         memberOne: {
+                //             profileId: profile.id
+                //         },
+                //         memberTwo: {
+                //             profileId: profile.id
+                //         }
+                //     }
+                // ]// немного непонятный запрос, но ничего страшного
+                // // по факту тут написано, что нам надо найти такую строчку в табличке диалогов
+                // // где айдишник зареганного сейчас чела, совпадает либо со столбиком 1ого мембера, либо второго
+                // // если мы не добавляем это условие, то тогда возможна ситуация, что 
 
             },
             include: {
-                members: true
+                memberOne: {
+                    include: {
+                        profile: true
+                    }
+                },
+                memberTwo: {
+                    include: {
+                        profile: true
+                    }
+                }
             }
         })
 
-        if (!server) return res.status(401).json({ error: 'server not found' })
 
-        const channel = await db.channel.findFirst({ // находим канал, куда будем постить смску
-            where: {
-                id: channelId as string,
-                serverId: serverId as string
-            }
-        })
-
-        if (!channel) return res.status(401).json({ error: 'channel not found' })
-
-        const member = server.members.filter(member => member.profileId === profile.id)[0] // ошибка была в том, что я мембер айди сравнивал с профайл айди, хотя это 2 разных поля и мне не находило мембера и возвращало ошибку
+        const member = conversation?.memberOne.profileId === profile.id ? conversation.memberOne : conversation?.memberTwo
 
         if (!member) return res.status(401).json({ error: 'member not found' })
 
         // когда мы успешно нашли, все, что нам надо, можем создавать строчку в нашей табличке
 
-        const message = await db.message.create({
+        const message = await db.directMessage.create({
             data: {
                 content,
-                channelId: channelId as string,
+                conversationId: conversationId as string,
                 memberId: member.id,
-                deleted: false,
-                fileUrl
+                file_url: fileUrl,
+
             },
             include: {
                 member: {
@@ -84,7 +89,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
         // создадим для сокета ключ для этой румы (т.к. у нас разные каналы => это разные румы сокета) 
         // из одного канала нельзя видеть смску из другого
 
-        const channelKey = `chat:${channel.id}:messages`
+        const channelKey = `chat:${conversationId}:messages`
 
         res?.socket?.server?.io?.emit(channelKey, message) // инициируем событие, и отправляем дату (message)
 

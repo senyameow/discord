@@ -40,7 +40,7 @@ import qs from 'query-string'
 // создаем схему формы с помощью зода (крутая валидация)
 
 const formSchema = z.object({
-
+    content: z.string().min(1, ' '),
     fileUrl: z.string().min(1, ' ')
 })
 // теперь просто берем и прокидываем нашу схему в форму с помощью резолвера
@@ -68,6 +68,7 @@ export const MessageFileModal = () => {
     const form = useForm({
         resolver: zodResolver(formSchema), // теперь форма должна соответствовать правилам описанным в formSchema
         defaultValues: {
+            content: '',
             fileUrl: '',
         }
     })
@@ -88,7 +89,8 @@ export const MessageFileModal = () => {
 
             await axios.post(url, {
                 ...values,
-                content: values.fileUrl
+                content: values.content,
+                fileUrl: values.fileUrl
             })
 
             form.reset()

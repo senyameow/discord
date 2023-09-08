@@ -27,6 +27,9 @@ import axios from 'axios';
 
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
+import { useModal } from '../hooks/use-modal-store';
+import { useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 interface ChatMessageProps {
     id: string; // всегда айдишник нужен, вдруг понадобится
@@ -68,6 +71,12 @@ const ChatMessage = ({ id, content, member, timestamp, deleted, fileUrl, current
         form.reset()
     }, [content])
 
+    const onMemberClick = () => {
+        if (member.id === currentMember.id) return
+
+        router.push(`/servers/${params?.serverId}/conversations/${member.id}`) // пушим чувака по руту к диалогу с этим мужиком
+    }
+
 
     // теперь надо понять, как мы будем понимать, кто может удалять смски, апдейтить и т.д.
     // т.е. нам надо получить какие-то константы
@@ -103,6 +112,12 @@ const ChatMessage = ({ id, content, member, timestamp, deleted, fileUrl, current
     // следовательно нам надо сделать стейт
     const [isEditing, setIsEditing] = useState(false)
 
+    const { onOpen, isOpen, onClose, data, type } = useModal()
+
+    const params = useParams()
+    const router = useRouter()
+
+
 
 
     // если мы эдитем, то это форма
@@ -125,10 +140,15 @@ const ChatMessage = ({ id, content, member, timestamp, deleted, fileUrl, current
                 query: socketQuery // прям красиво встанет, так как это объект уже и поля и все ой как хорошо
             })
             await axios.patch(url, values)
+
+            form.reset()
+            setIsEditing(false)
         } catch (error) {
             console.log(error)
         }
     }
+
+
 
     // теперь делаем keydown эвенты
     // как обычно через useEffect 
@@ -152,12 +172,12 @@ const ChatMessage = ({ id, content, member, timestamp, deleted, fileUrl, current
     return (
         <div className='group bg-transparent relative flex items-center hover:bg-black/5 w-full p-4'>
             <div className="flex flex-row items-center gap-2 group w-full">
-                <div className='cursor-pointer hover:drop-shadow-lg transition shadow-zinc-300'>
+                <div onClick={onMemberClick} className='cursor-pointer hover:drop-shadow-lg transition shadow-zinc-300'>
                     <UserAvatar image_url={member.profile.image_url} />
                 </div>
                 <div className='flex-1 flex flex-col justify-between h-full'>
                     <div className='flex flex-row gap-1 items-center'>
-                        <p className='text-white font-semibold text-md'>{member.profile.name}</p>
+                        <p onClick={onMemberClick} className='text-white font-semibold text-md'>{member.profile.name}</p>
                         {/* {member.role === 'GUEST' && null}
                         {member.role === 'MODERATOR' && (<ActionTooltip label={member.role}><ShieldCheck className={'text-indigo-500 w-4 h-4'} /></ActionTooltip>)}
                         {member.role === 'ADMIN' && (<ActionTooltip label={member.role}><ShieldCheck className={'text-rose-500 w-4 h-4'} /></ActionTooltip>)} */}
@@ -238,7 +258,7 @@ const ChatMessage = ({ id, content, member, timestamp, deleted, fileUrl, current
                     </ActionTooltip>
                 )}
                 <ActionTooltip label='delete'>
-                    <Trash className='cursor-pointer w-5 h-5 text-zinc-400 dark:text-zinc-500 dark:hover:text-zinc-300 transition' />
+                    <Trash onClick={() => onOpen('deleteMessage', { apiUrl: `${socketUrl}/${id}`, query: socketQuery })} className='cursor-pointer w-5 h-5 text-zinc-400 dark:text-zinc-500 dark:hover:text-zinc-300 transition' />
                 </ActionTooltip>
             </div>}
         </div>

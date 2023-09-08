@@ -161,8 +161,8 @@ model DirectMessage {
   conversationId String
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade) // связь с диалогом
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  created_At DateTime @default(now())
+  updated_At DateTime @updatedAt
 
   @@index([conversationId])
   @@index([memberId])
