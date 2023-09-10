@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
 
         const profile = await currentProfile(req)
 
-        if (!profile) return res.status(401).json({ error: 'Unauthorized' })
+        if (!profile) return res.status(401).json({ error: 'WQEWQQWE' })
 
         const { content, fileUrl } = req.body // так мы ловим то, что было отправлено по запросу
 
@@ -28,19 +28,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
         // т.к. чтобы залить смску в табличку messages, нам нужны эти поля там
 
 
-        const conversation = await db.conversation.findFirst({
+        const conversation = await db.conversation.findUnique({
             where: {
                 id: conversationId as string,
-                // OR: [
-                //     {
-                //         memberOne: {
-                //             profileId: profile.id
-                //         },
-                //         memberTwo: {
-                //             profileId: profile.id
-                //         }
-                //     }
-                // ]// немного непонятный запрос, но ничего страшного
+                OR: [ // просто надо правильно OR написать, и все заработает
+                    {
+                        memberOne: {
+                            profileId: profile.id
+                        },
+                    },
+                    {
+                        memberTwo: {
+                            profileId: profile.id
+                        }
+                    }
+                ]
+                // немного непонятный запрос, но ничего страшного
                 // // по факту тут написано, что нам надо найти такую строчку в табличке диалогов
                 // // где айдишник зареганного сейчас чела, совпадает либо со столбиком 1ого мембера, либо второго
                 // // если мы не добавляем это условие, то тогда возможна ситуация, что 
@@ -63,7 +66,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
 
         const member = conversation?.memberOne.profileId === profile.id ? conversation.memberOne : conversation?.memberTwo
 
-        if (!member) return res.status(401).json({ error: 'member not found' })
+
+        if (!member) {
+            return res.status(401).json({ error: 'member not found' })
+        }
 
         // когда мы успешно нашли, все, что нам надо, можем создавать строчку в нашей табличке
 

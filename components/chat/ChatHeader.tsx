@@ -4,6 +4,7 @@ import MobileToggle from '../MobileToggle';
 import Image from 'next/image';
 import UserAvatar from '../UserAvatar';
 import { SocketIndicator } from '../SocketIndicator';
+import { ChatVideoButton } from './ChatVideoButton';
 
 // что мне нужно для хедера?
 
@@ -23,9 +24,10 @@ const ChatHeader = ({ serverId, name, type, image_url }: ChatHeaderProps) => {
                 <Hash className='text-zinc-500 dark:text-zinc-400 w-5 h-5' />
 
             )}
-            <UserAvatar image_url={image_url} className='dark:w-8 dark:h-8 rounded-full z-[99]' />
+            <UserAvatar image_url={image_url} className='dark:w-8 dark:h-8 rounded-full z-[99] mr-4' />
             <p className='font-semibold text-md'>{name}</p>
             <div className='ml-auto'>
+                {type === 'conversation' && <ChatVideoButton name={name} />}
                 <SocketIndicator />
             </div>
         </div>

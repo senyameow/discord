@@ -19,7 +19,6 @@ type MessageWithMemberWithProfile = Message & {
 
 export const useChatSocket = ({ addKey, updateKey, queryKey }: ChatSocketProps) => {
 
-    console.log(updateKey)
     const { socket } = useSocket()
     const queryClient = useQueryClient()
 

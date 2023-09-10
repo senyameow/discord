@@ -14,11 +14,14 @@ interface ConversationProps {
 }
 
 export const getConversation = async (memberOneId: string, memberTwoId: string) => {
+    console.log(memberOneId, 'MEMBER ONE ID')
+    console.log(memberTwoId, 'MEMBER TWO ID')
     try {
 
-        let conversation = await findConversation(memberOneId, memberTwoId) || await findConversation(memberOneId, memberTwoId)
+        let conversation = await findConversation(memberOneId, memberTwoId) || await findConversation(memberTwoId, memberOneId)
         // типо диалоги могут быть в двух направлениях, соответственно, искать их тоже нужно в двух 
         // с помозью пайпов можем в одну строчку записать (если не найдет по первому, будет искать по второму)
+        console.log(conversation, 'GET CONVERSATION')
 
         if (!conversation) {
             conversation = await createNewConversation(memberOneId, memberTwoId) // если не смогли найти, то создаем!
@@ -37,9 +40,10 @@ export const findConversation = async (memberOneId: string, memberTwoId: string)
     try {
         return await db.conversation.findFirst({
             where: {
+
                 AND: [
-                    { memberOneId },
-                    { memberTwoId }
+                    { memberOneId: memberOneId },
+                    { memberTwoId: memberTwoId },
                 ] // найдет в тибличке с диалогами только тот, где совпадают два эти условия одновременно
             },
             include: {

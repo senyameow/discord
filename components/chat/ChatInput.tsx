@@ -107,6 +107,7 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
                                         <Plus className='text-white dark:text-[#313338]' size={24} />
                                     </button>
                                     <Input
+
                                         placeholder={`Message ${type === 'conversation' ? name : '#' + name}`}
                                         {...field} disabled={isLoading} className='px-14 border-none border-0 focus-visible:ring-0 ring-offset-0 focus-visible:ring-offset-0 py-6 dark:bg-zinc-700/60 text-zinc-600 dark:text-zinc-200' />
                                     {/* и небольшой смайлик, для модалки со смайлами */}

@@ -69,7 +69,6 @@ export const useChatScroll = ({ chatRef, bottomRef, fetchMore, count, shouldFetc
             // эти воспользуемся, и сделаем так, чтобы он выводил маркер
 
             const distanceFromTop = chatRef.current.scrollHeight - chatRef.current.clientHeight - chatRef.current.scrollTop // устанешь думать)
-            console.log(distanceFromTop)
             return distanceFromTop <= 200 // при новой смске появляется 217 пикселей вроде 
 
 

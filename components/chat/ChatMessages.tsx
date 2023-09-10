@@ -67,11 +67,7 @@ const ChatMessages = ({ name, chatId, member, apiUrl, socketUrl, socketQuery, pa
     // }, [chatRef.current?.scrollTop, chatRef])
 
     // console.log(chatRef.current?.scrollTop)
-    console.log(bottomRef.current)
 
-    console.log(chatRef?.current?.scrollHeight, 'ВСЕГО ВЫСОТА')
-    console.log(chatRef?.current?.scrollTop, 'ПИКСЕЛЕЙ ДО ВЕРХА')
-    console.log(chatRef?.current?.clientHeight, 'ПИКСЕЛЕЙ ЧАТА ВХОДИТ В ОКОШКО ЧАТА')
 
     // console.log(bottomRef.current)
 

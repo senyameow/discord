@@ -48,7 +48,6 @@ export const DeleteMEssageModal = () => {
     const { apiUrl, query } = data
 
 
-    console.log(apiUrl, data)
 
     const onDelete = async () => {
         try {
