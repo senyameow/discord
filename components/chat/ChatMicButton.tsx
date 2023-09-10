@@ -5,27 +5,27 @@
 // мы должны сделать запрос на сервер qs
 
 import { useRouter, useParams, useSearchParams, usePathname } from "next/navigation"
-import { Video, VideoOff } from "lucide-react"
+import { Mic, MicOff, Video, VideoOff } from "lucide-react"
 import { ActionTooltip } from "../navigation/action-tooltip"
 import { useEffect } from "react"
 import qs from 'query-string'
 
-interface ChatVideoButtonProps {
+interface ChatMicButtonProps {
     name: string;
 
 }
 
 
-export const ChatVideoButton = ({ name }: ChatVideoButtonProps) => {
+export const ChatMicButton = ({ name }: ChatMicButtonProps) => {
     const searchParams = useSearchParams()
-    const isVideo = searchParams?.get('video')
+    const isAudio = searchParams?.get('audio')
     const pathname = usePathname()
     const router = useRouter()
     // URL -> `/dashboard?search=my-project`
     // `search` -> 'my-project'
     // (про searchParams)
 
-    const Icon = isVideo ? VideoOff : Video
+    const Icon = isAudio ? MicOff : Mic
 
 
     // у нас есть базовый прикол, когда хотим как-то ответить на изменения пути
@@ -50,7 +50,7 @@ export const ChatVideoButton = ({ name }: ChatVideoButtonProps) => {
         const url = qs.stringifyUrl({
             url: pathname || '',
             query: {
-                video: isVideo ? undefined : true
+                audio: isAudio ? undefined : true
             }
         })
         router.push(url)

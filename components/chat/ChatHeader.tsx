@@ -5,6 +5,7 @@ import Image from 'next/image';
 import UserAvatar from '../UserAvatar';
 import { SocketIndicator } from '../SocketIndicator';
 import { ChatVideoButton } from './ChatVideoButton';
+import { ChatMicButton } from './ChatMicButton';
 
 // что мне нужно для хедера?
 
@@ -26,8 +27,9 @@ const ChatHeader = ({ serverId, name, type, image_url }: ChatHeaderProps) => {
             )}
             <UserAvatar image_url={image_url} className='dark:w-8 dark:h-8 rounded-full z-[99] mr-4' />
             <p className='font-semibold text-md'>{name}</p>
-            <div className='ml-auto'>
+            <div className='ml-auto flex flex-row items-center gap-2'>
                 {type === 'conversation' && <ChatVideoButton name={name} />}
+                {type === 'conversation' && <ChatMicButton name={name} />}
                 <SocketIndicator />
             </div>
         </div>

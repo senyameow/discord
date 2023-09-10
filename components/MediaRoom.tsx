@@ -13,14 +13,22 @@ import { useEffect, useState } from 'react';
 
 import { useUser } from '@clerk/nextjs';
 import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface MediaRoomProps {
     chatId: string;
-    video: boolean;
-    audio: boolean;
+    video?: boolean;
+    audio?: boolean;
+    serverId: string
 }
 
-export const MediaRoom = ({ chatId, video, audio }: MediaRoomProps) => {
+export const MediaRoom = ({ chatId, video, audio, serverId }: MediaRoomProps) => {
+
+    const router = useRouter()
+
+    const onDisconnect = () => {
+        router.push(`/servers/${serverId}/conversations/${chatId}`)
+    }
 
     // мне нужен токен и юрл (по докам)
     // токен составляется из многих вещей, а точнее
@@ -70,7 +78,7 @@ export const MediaRoom = ({ chatId, video, audio }: MediaRoomProps) => {
     // если токен появился, это значит, что мы можем войти в руму
     // для этого у нас уже есть LiveKitRoom
     return (
-        <LiveKitRoom token={token} data-lk-theme='default' serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL} video={video} audio={audio}>
+        <LiveKitRoom token={token} data-lk-theme='default' serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL} video={video} audio={audio} onDisconnected={onDisconnect}>
             <VideoConference /> {/* и внутрь закидываем видео конференцию */}
         </LiveKitRoom>
     )
