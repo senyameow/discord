@@ -109,7 +109,7 @@ export const EditServerModal = () => {
             form.setValue('name', server.name);
             form.setValue('image_url', server.image_url);
         } // вот так можно реализовывать едитинг формы (т.е. открывается модалка, и когда она загрузилась там уже в полях есть предыдущие значения)
-    }, [])
+    }, [form, server])
 
     return (
         <Dialog open={isModalOpen} onOpenChange={onChange}> {/* сделаем его по дефолту открытым */}
