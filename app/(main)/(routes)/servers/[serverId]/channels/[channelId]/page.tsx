@@ -53,8 +53,8 @@ const ChannelIdPage = async ({ params }: ChannelIdPageProps) => {
         <div className='flex flex-col h-full bg-white dark:bg-[#313338]'>
             <ChatHeader name={channel.name} serverId={channel.serverId} type='channel' image_url={''} />
             {channel.type === ChannelType.TEXT && <ChatMessages name={channel.name} member={member} chatId={channel.id} type='channel' apiUrl='/api/messages' socketUrl='/api/socket/messages' socketQuery={{ channelId: channel.id, serverId: channel.serverId }} paramKey='channelId' paramValue={channel.id} />}
-            {channel.type === ChannelType.AUDIO && <MediaRoom chatId={channel.id} audio={true} video={false} />}
-            {channel.type === ChannelType.VIDEO && <MediaRoom chatId={channel.id} audio={false} video={true} />}
+            {channel.type === ChannelType.AUDIO && <MediaRoom serverId={params?.serverId} chatId={channel.id} audio={true} video={false} />}
+            {channel.type === ChannelType.VIDEO && <MediaRoom serverId={params?.serverId} chatId={channel.id} audio={false} video={true} />}
             <ChatInput name={channel.name} type='channel' apiUrl='/api/socket/messages' query={{
                 channelId: channel.id,
                 serverId: channel.serverId
