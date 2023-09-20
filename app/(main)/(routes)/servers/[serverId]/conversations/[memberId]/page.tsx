@@ -34,7 +34,7 @@ const MemberIdPage = async ({
     const profile = await currentProfile();
 
     if (!profile) {
-        return redirectToSignIn();
+        return redirect('/sign-in')
     }
 
     const currentMember = await db.member.findFirst({

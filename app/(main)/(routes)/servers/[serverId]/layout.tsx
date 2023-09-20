@@ -1,7 +1,6 @@
 import ServerSidebar from '@/components/server/ServerSidebar'
 import { currentProfile } from '@/lib/current-profile'
 import { db } from '@/lib/db'
-import { redirectToSignIn } from '@clerk/nextjs'
 import { redirect } from 'next/navigation'
 import React from 'react'
 
@@ -9,7 +8,7 @@ const ServerIdLayout = async ({ children, params }: { children: React.ReactNode,
 
     const profile = await currentProfile() // получаем профайл (если его нет то редиректим чувака регаться)
 
-    if (!profile) return redirectToSignIn()
+    if (!profile) return redirect('/sign-in')
 
     // что есть в этом лэйауте?
     // название сервака с дропдауном
