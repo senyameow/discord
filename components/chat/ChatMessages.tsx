@@ -107,8 +107,8 @@ const ChatMessages = ({ name, chatId, member, apiUrl, socketUrl, socketQuery, pa
     }
 
     return (
-        <div ref={chatRef} className='flex-1 flex flex-col overflow-y-auto border-rose-400 border'>
-            {!hasNextPage && <div className='flex-1 border border-blue-300' />}
+        <div ref={chatRef} className='flex-1 flex flex-col overflow-y-auto'>
+            {!hasNextPage && <div className='flex-1' />}
             {!hasNextPage && <ChatWelcome type={type} name={name} />}
             {/* если у нас есть следующая страница, при ее загрузке мы должны что-то показывать */}
             {hasNextPage && (
