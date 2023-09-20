@@ -4,6 +4,7 @@ import { redirectToSignIn } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import React from 'react'
 
+
 // как вообще будет происходить процесс перехода по инвайт ссылке.
 // явно нам надо добавить челика в список мемберов сервера (но как?)
 
@@ -24,7 +25,7 @@ const InviteCodePage = async ({ params }: InviteCodePageParams) => {
     const profile = await currentProfile()
 
     if (!profile) {
-        return redirectToSignIn()
+        return redirectToSignIn({ returnBackUrl: 'http://localhost:3000/sign-in' })
     }
 
     if (!params.inviteCode) return redirect('/')

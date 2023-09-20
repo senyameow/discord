@@ -24,7 +24,7 @@ const SetupPage = async () => {
         }
     }) // найди среди серверов такой, где хотя бы (some) в одной строчке (колонке мемберс) есть наш айдишник чувака
 
-    if (initialServer) return redirect(`servers/${initialServer.id}`) // создадим рут /servers и в него положем [id] рут (динамический)
+    if (initialServer) return redirect(`/servers/${initialServer.id}`) // создадим рут /servers и в него положем [id] рут (динамический)
 
     return (
         <InitialModal />
